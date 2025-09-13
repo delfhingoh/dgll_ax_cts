@@ -16,3 +16,9 @@ spring:
       path: /h2-console
 server:
   port: 8080
+
+api:
+  binance:
+    url: https://api.binance.com
+  houbi:
+    url: https://api.huobi.pro
