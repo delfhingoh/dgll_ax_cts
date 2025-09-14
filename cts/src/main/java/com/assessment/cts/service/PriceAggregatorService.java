@@ -3,56 +3,54 @@ package com.assessment.cts.service;
 import com.assessment.cts.entity.Price;
 import com.assessment.cts.entity.Product;
 import com.assessment.cts.enums.Status;
+import com.assessment.cts.model.PriceDTO;
+import com.assessment.cts.model.ResponseDTO;
 import com.assessment.cts.model.api.PriceResponse;
-import com.assessment.cts.repository.CurrencyRepository;
-import com.assessment.cts.repository.PriceRepository;
-import com.assessment.cts.repository.ProductRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class PriceAggregatorService {
-
-    private final ProductRepository productRepository;
-    private final CurrencyRepository currencyRepository;
-    private final PriceRepository priceRepository;
     private final ProductService productService;
+    private final PriceService priceService;
 
     public void aggregatePrices(List<PriceResponse> priceResponses) {
         List<Product> activeProducts = this.productService.getProductsByStatus(Status.ACTIVE);
         if (activeProducts.isEmpty()) {
             log.info("No active products found. Unable to aggregate prices.");
             return;
-        } else {
-            Set<String> activeProductsBySymbol = activeProducts.stream()
-                    .map(Product::getSymbol)
-                    .collect(Collectors.toSet());
-            List<PriceResponse> filtered = priceResponses.stream()
-                    .filter(priceResponse -> activeProductsBySymbol.contains(priceResponse.getSymbol()))
-                    .toList();
-
-            // Group the active product prices into product
-            // ETCUSDT ---> <List of prices>
-            // BTCUSDT ---> <List of prices>
-            Map<String, List<PriceResponse>> groupedByProduct = filtered.stream()
-                            .collect(Collectors.groupingBy(PriceResponse::getSymbol));
-
-            findAndSaveBestPrice(groupedByProduct);
         }
+        // Putting active products symbol, "ETHUSDT", into Set (Although List might be okay since Product have Constraints)
+        Set<String> activeProductsBySymbol = activeProducts.stream()
+                .map(Product::getSymbol)
+                .collect(Collectors.toSet());
+
+        // Filter the list of prices from multiple sources to get only prices for active product
+        Map<String, Product> productMap = activeProducts.stream()
+                .collect(Collectors.toMap(Product::getSymbol, product -> product));
+
+        List<PriceResponse> filtered = priceResponses.stream()
+                .filter(priceResponse -> activeProductsBySymbol.contains(priceResponse.getSymbol()))
+                .toList();
+
+        // Group the active product prices by product
+        // <ETCUSDT, List of prices>
+        // <BTCUSDT, List of prices>
+        Map<String, List<PriceResponse>> groupedByProduct = filtered.stream()
+                        .collect(Collectors.groupingBy(PriceResponse::getSymbol));
+
+        findAndSaveBestPrice(groupedByProduct);
     }
 
     private void findAndSaveBestPrice(Map<String, List<PriceResponse>> groupedByProduct) {
         if (groupedByProduct.isEmpty()) {
-            log.info("No prices found. Unable to aggregate prices.");
+            log.info("No prices by product found. Unable to aggregate prices.");
             return;
         } else {
             for (Map.Entry<String, List<PriceResponse>> entry : groupedByProduct.entrySet()) {
@@ -72,7 +70,7 @@ public class PriceAggregatorService {
                 // There should be a BID and ASK
                 if (bestBidPriceResponse != null && bestAskPriceResponse != null) {
                     Price price = new Price();
-                    Product product = this.productRepository.findBySymbol(symbol);
+                    Product product = this.productService.getProductBySymbol(symbol);
                     price.setProduct(product);
                     price.setBidPrice(bestBidPriceResponse.getBidPrice());
                     price.setBidQuantity(bestBidPriceResponse.getBidQuantity());
@@ -80,7 +78,8 @@ public class PriceAggregatorService {
                     price.setAskPrice(bestAskPriceResponse.getAskPrice());
                     price.setAskQuantity(bestAskPriceResponse.getAskQuantity());
                     price.setAskSource(bestAskPriceResponse.getSource());
-                    this.priceRepository.save(price);
+                    ResponseDTO<PriceDTO> savePriceResult = this.priceService.saveThisPrice(price);
+                    log.info("Save price result: {}", savePriceResult.getResponseStatus());
                 } else {
                     log.info("Missing bid or ask price. Unable to save best prices.");
                 }

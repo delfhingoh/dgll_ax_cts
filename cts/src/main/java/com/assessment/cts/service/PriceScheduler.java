@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 @Slf4j
 @Component
@@ -20,7 +20,7 @@ public class PriceScheduler {
     private final PriceAggregatorService priceAggregatorService;
     private final ExecutorService executorService;
 
-    private final int SECONDS = 10000; // 10 seconds
+    private final long FETCH_PRICE_INTERVAL_MS = 10_000L; // 10 seconds
 
     public PriceScheduler(List<ExchangePriceService<?>> exchangePriceServices, PriceAggregatorService priceAggregatorService) {
         this.exchangePriceServices = exchangePriceServices;
@@ -33,21 +33,22 @@ public class PriceScheduler {
     }
 
     // Fetch prices from multiple sources concurrently then pass it to PriceAggregatorService
-    @Scheduled(fixedRate = SECONDS)
+    @Scheduled(fixedRate = FETCH_PRICE_INTERVAL_MS)
     private void fetchPrices() {
-        List<Future<List<PriceResponse>>> futures = new ArrayList<>();
-        for (ExchangePriceService<?> exchangePriceService : exchangePriceServices) {
-            futures.add(executorService.submit(exchangePriceService::fetchPrices));
-        }
+        // Use CompletableFuture to chain methods
+        List<CompletableFuture<List<PriceResponse>>> futures = exchangePriceServices.stream()
+            .map(service -> CompletableFuture.supplyAsync(service::fetchPrices, executorService)
+                .exceptionally(ex -> {
+                    log.error("Error fetching prices from {}", service.getClass().getSimpleName(), ex);
+                    return List.of();
+                }))
+            .toList();
 
-        List<PriceResponse> priceResponses = new ArrayList<>();
-        for (Future<List<PriceResponse>> future : futures) {
-            try {
-                priceResponses.addAll(future.get());
-            } catch (Exception e) {
-                log.error("Error fetching prices from service.", e);
-            }
-        }
+        // Once all prices come back
+        List<PriceResponse> priceResponses = futures.stream()
+                .map(CompletableFuture::join)
+                .flatMap(Collection::stream)
+                .toList();
 
         priceAggregatorService.aggregatePrices(priceResponses);
     }

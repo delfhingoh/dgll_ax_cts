@@ -4,8 +4,10 @@ import com.assessment.cts.entity.Price;
 import com.assessment.cts.entity.Product;
 import com.assessment.cts.enums.ResponseStatus;
 import com.assessment.cts.model.PriceDTO;
+import com.assessment.cts.model.ResponseDTO;
 import com.assessment.cts.repository.PriceRepository;
 import com.assessment.cts.repository.ProductRepository;
+import com.assessment.cts.service.HelperUtility;
 import com.assessment.cts.service.PriceService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,17 @@ import java.util.Optional;
 public class PriceServiceImpl implements PriceService {
     private final PriceRepository priceRepository;
     private final ProductRepository productRepository;
+    private HelperUtility helper;
+
+    @Override
+    public ResponseDTO<PriceDTO> saveThisPrice(Price price) {
+        try {
+            this.priceRepository.save(price);
+            return this.helper.transformToResponseDTO(mapToPriceDTO(price), ResponseStatus.SUCCESS, "Saved price successfully");
+        } catch (Exception e) {
+            return this.helper.transformToResponseDTO(mapToPriceDTO(price), ResponseStatus.ERROR, "Unable to save price: " + price.getProduct());
+        }
+    }
 
     @Override
     public PriceDTO getLatestPrice(String ccyPair) {
