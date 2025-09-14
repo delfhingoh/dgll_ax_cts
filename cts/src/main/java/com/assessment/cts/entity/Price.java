@@ -21,22 +21,23 @@ public class Price {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(precision = 28, scale = 8)
+    @Column(nullable = false, precision = 28, scale = 8)
     private BigDecimal bidPrice;
-    @Column(precision = 28, scale = 8)
+    @Column(nullable = false, precision = 28, scale = 8)
     private BigDecimal bidQuantity;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 25)
     private PriceSource bidSource;
 
-    @Column(precision = 28, scale = 8)
+    @Column(nullable = false, precision = 28, scale = 8)
     private BigDecimal askPrice;
-    @Column(precision = 28, scale = 8)
+    @Column(nullable = false, precision = 28, scale = 8)
     private BigDecimal askQuantity;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 25)
     private PriceSource askSource;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 }
