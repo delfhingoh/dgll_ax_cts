@@ -1,7 +1,10 @@
 package com.assessment.cts.entity;
 
+import com.assessment.cts.enums.TradeDirection;
 import com.assessment.cts.enums.TradeStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +17,8 @@ import java.time.LocalDateTime;
             @Index(name = "idx_trade_user", columnList = "user_id")
     }
 )
+@Getter
+@Setter
 public class Trade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,12 +38,17 @@ public class Trade {
     @JoinColumn(name = "quote_currency_id")
     private Currency quoteCurrency;
     @Column(nullable = false, precision = 28, scale = 8)
+    private BigDecimal finalAmount;
+    @Column(nullable = false, precision = 28, scale = 8)
     private BigDecimal notionalAmount;
     @Column(nullable = false, precision = 28, scale = 8)
     private BigDecimal rateAmount;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 25)
     private TradeStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 25)
+    private TradeDirection direction;
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
