@@ -1,4 +1,4 @@
-package com.assessment.cts.model;
+package com.assessment.cts.model.api;
 
 import com.assessment.cts.enums.PriceSource;
 import lombok.Data;
