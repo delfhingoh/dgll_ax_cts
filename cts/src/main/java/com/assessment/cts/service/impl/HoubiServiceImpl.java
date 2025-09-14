@@ -37,7 +37,7 @@ public class HoubiServiceImpl implements ExchangePriceService<HoubiTicker> {
     public PriceResponse mapToPrice(HoubiTicker price) {
         PriceResponse priceResponse = new PriceResponse();
         priceResponse.setSource(PriceSource.HOUBI);
-        priceResponse.setSymbol(price.getSymbol());
+        priceResponse.setSymbol(price.getSymbol().toUpperCase());
         priceResponse.setBidPrice(price.getBid());
         priceResponse.setAskPrice(price.getAsk());
         priceResponse.setBidQuantity(price.getBidSize());
