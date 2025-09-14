@@ -15,6 +15,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
+    public Product getProductBySymbol(String symbol) {
+        return productRepository.findBySymbol(symbol);
+    }
+
+    @Override
     public List<Product> getProductsByStatus(Status status) {
         return this.productRepository.findByStatus(status);
     }

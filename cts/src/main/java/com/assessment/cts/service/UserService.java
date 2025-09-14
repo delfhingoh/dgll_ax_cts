@@ -1,5 +1,6 @@
 package com.assessment.cts.service;
 
+import com.assessment.cts.entity.User;
 import com.assessment.cts.model.ResponseDTO;
 import com.assessment.cts.model.ResponseListDTO;
 import com.assessment.cts.model.TradeResponseDTO;
@@ -15,4 +16,6 @@ public interface UserService {
     ResponseDTO<WalletBalanceResponseDTO> getUserWallet(String uuid, String currency);
     ResponseListDTO<WalletBalanceResponseDTO> getUserWallets(String uuid);
     ResponseListDTO<TradeResponseDTO> getTradeHistory(String uuid);
+
+    User getUserByUuid(String uuid);
 }

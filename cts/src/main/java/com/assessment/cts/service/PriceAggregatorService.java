@@ -3,7 +3,7 @@ package com.assessment.cts.service;
 import com.assessment.cts.entity.Price;
 import com.assessment.cts.entity.Product;
 import com.assessment.cts.enums.Status;
-import com.assessment.cts.model.PriceResponse;
+import com.assessment.cts.model.api.PriceResponse;
 import com.assessment.cts.repository.CurrencyRepository;
 import com.assessment.cts.repository.PriceRepository;
 import com.assessment.cts.repository.ProductRepository;

@@ -35,6 +35,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByUuid(String uuid) {
+        return this.userRepository.findByUuid(uuid).orElse(null);
+    }
+
+    @Override
     public ResponseDTO<WalletBalanceResponseDTO> getUserWallet(String uuid, String currency) {
         try {
             Optional<User> userOptional = this.userRepository.findByUuid(uuid);
@@ -120,7 +125,7 @@ public class UserServiceImpl implements UserService {
                 responseListDTO.setMessage("User is empty. Not able to retrieve uuid");
                 return responseListDTO;
             } else {
-                List<Trade> trades = this.tradeRepository.findByUser(userOptional.get());
+                List<Trade> trades = this.tradeRepository.findByUserOrderByCreatedAt(userOptional.get());
                 if (trades.isEmpty()) {
                     ResponseListDTO<TradeResponseDTO> responseListDTO = new ResponseListDTO<>();
                     responseListDTO.setResponseStatus(ResponseStatus.INVALID);
