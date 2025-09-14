@@ -3,6 +3,8 @@ package com.assessment.cts.entity;
 import com.assessment.cts.enums.ProductType;
 import com.assessment.cts.enums.Status;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -18,6 +20,8 @@ import java.util.UUID;
         @Index(name = "idx_wallet_user", columnList = "user_id")
     }
 )
+@Getter
+@Setter
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -2,6 +2,8 @@ package com.assessment.cts.entity;
 
 import com.assessment.cts.enums.Status;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_product_symbol", columnList = "symbol")
     }
 )
+@Getter
+@Setter
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,6 +3,8 @@ package com.assessment.cts.entity;
 import com.assessment.cts.enums.CurrencyType;
 import com.assessment.cts.enums.Status;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_currency_code", columnList = "code")
     }
 )
+@Getter
+@Setter
 public class Currency {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +32,7 @@ public class Currency {
     private String code;    // ETH, USDT
     @Column(nullable = false, length = 50)
     private String name;    // Tether
-    @Column(nullable = false, length = 10)
+    @Column(length = 10)
     private String symbol;  // $ in unicode
     @Column(nullable = false)
     private int decimals;

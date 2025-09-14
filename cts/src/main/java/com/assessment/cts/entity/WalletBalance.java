@@ -2,6 +2,8 @@ package com.assessment.cts.entity;
 
 import com.assessment.cts.enums.ProductType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_balance_wallet_currency", columnList = "wallet_id, currency_id")
     }
 )
+@Getter
+@Setter
 public class WalletBalance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
