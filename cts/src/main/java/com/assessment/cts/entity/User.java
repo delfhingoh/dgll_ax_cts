@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 public class User {
@@ -26,4 +27,11 @@ public class User {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
 }
