@@ -7,22 +7,24 @@ import com.assessment.cts.model.ResponseListDTO;
 import com.assessment.cts.model.TradeResponseDTO;
 import com.assessment.cts.model.WalletBalanceResponseDTO;
 import com.assessment.cts.repository.*;
+import com.assessment.cts.service.HelperUtility;
+import com.assessment.cts.service.TradeService;
 import com.assessment.cts.service.UserService;
+import com.assessment.cts.service.WalletBalanceService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final WalletBalanceService walletBalanceService;
+    private final TradeRepository tradeRepository; // Next time, will name the other TradeService differently
     private final UserRepository userRepository;
-    private final WalletBalanceRepository walletBalanceRepository;
-    private final TradeRepository tradeRepository;
+    private final HelperUtility helper;
 
     @Override
     public String getJohnDoeUserUUID() {
@@ -35,73 +37,54 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByUuid(String uuid) {
-        return this.userRepository.findByUuid(uuid).orElse(null);
+    public ResponseDTO<User> getUserByUuid(String uuid) {
+        try {
+            Optional<User> userOptional = this.userRepository.findByUuid(uuid);
+            if (userOptional.isEmpty()) {
+                return this.helper.transformToResponseDTO(null, ResponseStatus.INVALID, "No user in this system.");
+            }
+            return this.helper.transformToResponseDTO(userOptional.get(), ResponseStatus.SUCCESS, "Retrieved user successfully by uuid");
+        } catch (Exception e) {
+            return this.helper.transformToResponseDTO(null, ResponseStatus.ERROR, "Something went wrong. Please try again later.");
+        }
     }
 
     @Override
     public ResponseDTO<WalletBalanceResponseDTO> getUserWallet(String uuid, String currency) {
         try {
-            Optional<User> userOptional = this.userRepository.findByUuid(uuid);
-            if (userOptional.isEmpty()) {
-                ResponseDTO<WalletBalanceResponseDTO> responseDTO = new ResponseDTO<>();
-                responseDTO.setResponseStatus(ResponseStatus.INVALID);
-                responseDTO.setMessage("User not found. Not able to retrieve wallet.");
-                return responseDTO;
+            ResponseDTO<User> user = getUserByUuid(uuid);
+            if (user.getResponse() == null) {
+                return this.helper.transformToResponseDTO(null, user.getResponseStatus(), user.getMessage());
+            }
+            ResponseDTO<WalletBalance> walletBalance = this.walletBalanceService.findByWalletUserUuidAndCurrencyCode(uuid, currency);
+            if (walletBalance.getResponse() == null) {
+                return this.helper.transformToResponseDTO(null, walletBalance.getResponseStatus(), walletBalance.getMessage());
             } else {
-                Optional<WalletBalance> walletBalanceOptional = this.walletBalanceRepository.findByWalletUserUuidAndCurrencyCode(uuid, currency);
-                if (walletBalanceOptional.isEmpty()) {
-                    ResponseDTO<WalletBalanceResponseDTO> responseDTO = new ResponseDTO<>();
-                    responseDTO.setResponseStatus(ResponseStatus.INVALID);
-                    responseDTO.setMessage("Wallet of that currency is not found.");
-                    return responseDTO;
-                } else {
-                    ResponseDTO<WalletBalanceResponseDTO> responseDTO = new ResponseDTO<>();
-                    WalletBalanceResponseDTO walletBalance = mapToBalanceResponseDTO(walletBalanceOptional.get());
-                    responseDTO.setResponse(walletBalance);
-                    responseDTO.setResponseStatus(ResponseStatus.SUCCESS);
-                    return responseDTO;
-                }
+                return this.helper.transformToResponseDTO(mapToBalanceResponseDTO(walletBalance.getResponse()), walletBalance.getResponseStatus(), walletBalance.getMessage());
             }
         } catch (Exception e) {
-            ResponseDTO<WalletBalanceResponseDTO> responseDTO = new ResponseDTO<>();
-            responseDTO.setResponseStatus(ResponseStatus.ERROR);
-            responseDTO.setMessage("Something went wrong. Please try again later.");
-            return responseDTO;
+            return this.helper.transformToResponseDTO(null, ResponseStatus.ERROR, "Something went wrong. Please try again later.");
         }
     }
 
     @Override
     public ResponseListDTO<WalletBalanceResponseDTO> getUserWallets(String uuid) {
         try {
-            Optional<User> userOptional = this.userRepository.findByUuid(uuid);
-            if (userOptional.isEmpty()) {
-                ResponseListDTO<WalletBalanceResponseDTO> responseDTO = new ResponseListDTO<>();
-                responseDTO.setResponseStatus(ResponseStatus.INVALID);
-                responseDTO.setMessage("User not found. Not able to retrieve wallets.");
-                return responseDTO;
-            } else  {
-                List<WalletBalance> walletBalances = this.walletBalanceRepository.findByWalletUserUuid(uuid);
-                if (walletBalances.isEmpty()) {
-                    ResponseListDTO<WalletBalanceResponseDTO> responseDTO = new ResponseListDTO<>();
-                    responseDTO.setResponseStatus(ResponseStatus.INVALID);
-                    responseDTO.setMessage("User have no wallets.");
-                    return responseDTO;
-                } else {
-                    ResponseListDTO<WalletBalanceResponseDTO> responseDTO = new ResponseListDTO<>();
-                    List<WalletBalanceResponseDTO> userAllWalletBalance = walletBalances.stream()
-                            .map(this::mapToBalanceResponseDTO)
-                            .toList();
-                    responseDTO.setList(userAllWalletBalance);
-                    responseDTO.setResponseStatus(ResponseStatus.SUCCESS);
-                    return responseDTO;
-                }
+            ResponseDTO<User> user = getUserByUuid(uuid);
+            if (user.getResponse() == null) {
+                return this.helper.transformToResponseListDTO(null, user.getResponseStatus(), user.getMessage());
             }
+
+            ResponseListDTO<WalletBalance> walletBalances = this.walletBalanceService.findByWalletUserUuid(uuid);
+            if (walletBalances.getList().isEmpty()) {
+                return this.helper.transformToResponseListDTO(null, walletBalances.getResponseStatus(), walletBalances.getMessage());
+            }
+            List<WalletBalanceResponseDTO> userAllWalletBalance = walletBalances.getList().stream()
+                    .map(this::mapToBalanceResponseDTO)
+                    .toList();
+            return this.helper.transformToResponseListDTO(userAllWalletBalance, ResponseStatus.SUCCESS, "Retrieved wallets successfully by uuid.");
         } catch (Exception e) {
-            ResponseListDTO<WalletBalanceResponseDTO> responseDTO = new ResponseListDTO<>();
-            responseDTO.setResponseStatus(ResponseStatus.ERROR);
-            responseDTO.setMessage("Something went wrong. Please try again later.");
-            return responseDTO;
+            return this.helper.transformToResponseListDTO(null, ResponseStatus.ERROR, "Something went wrong. Please try again later.");
         }
     }
 
@@ -118,34 +101,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseListDTO<TradeResponseDTO> getTradeHistory(String uuid) {
         try {
-            Optional<User> userOptional = this.userRepository.findByUuid(uuid);
-            if (userOptional.isEmpty()) {
-                ResponseListDTO<TradeResponseDTO> responseListDTO = new ResponseListDTO<>();
-                responseListDTO.setResponseStatus(ResponseStatus.INVALID);
-                responseListDTO.setMessage("User is empty. Not able to retrieve uuid");
-                return responseListDTO;
+            ResponseDTO<User> user = getUserByUuid(uuid);
+            if (user.getResponse() == null) {
+                return this.helper.transformToResponseListDTO(null, user.getResponseStatus(), user.getMessage());
+            }
+
+            List<Trade> trades = this.tradeRepository.findByUserOrderByCreatedAt(user.getResponse());
+            if (trades.isEmpty()) {
+                return this.helper.transformToResponseListDTO(null, ResponseStatus.INVALID, "User have not made any trades.");
             } else {
-                List<Trade> trades = this.tradeRepository.findByUserOrderByCreatedAt(userOptional.get());
-                if (trades.isEmpty()) {
-                    ResponseListDTO<TradeResponseDTO> responseListDTO = new ResponseListDTO<>();
-                    responseListDTO.setResponseStatus(ResponseStatus.INVALID);
-                    responseListDTO.setMessage("User have not made any trades.");
-                    return responseListDTO;
-                } else {
-                    ResponseListDTO<TradeResponseDTO> responseListDTO = new ResponseListDTO<>();
-                    List<TradeResponseDTO> tradesResponseDTO = trades.stream()
-                            .map(this::mapToTradeResponseDTO)
-                            .toList();
-                    responseListDTO.setList(tradesResponseDTO);
-                    responseListDTO.setResponseStatus(ResponseStatus.SUCCESS);
-                    return responseListDTO;
-                }
+                List<TradeResponseDTO> tradesResponseDTO = trades.stream()
+                        .map(this::mapToTradeResponseDTO)
+                        .toList();
+                return this.helper.transformToResponseListDTO(tradesResponseDTO, ResponseStatus.SUCCESS, "Retrieved trades by user.");
             }
         } catch (Exception e) {
-            ResponseListDTO<TradeResponseDTO> responseListDTO = new ResponseListDTO<>();
-            responseListDTO.setResponseStatus(ResponseStatus.ERROR);
-            responseListDTO.setMessage("Something went wrong. Please try again later");
-            return responseListDTO;
+            return this.helper.transformToResponseListDTO(null, ResponseStatus.ERROR, "Something went wrong. Please try again later.");
         }
     }
 

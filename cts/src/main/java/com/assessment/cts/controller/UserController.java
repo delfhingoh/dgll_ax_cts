@@ -5,12 +5,10 @@ import com.assessment.cts.model.ResponseListDTO;
 import com.assessment.cts.model.TradeResponseDTO;
 import com.assessment.cts.model.WalletBalanceResponseDTO;
 import com.assessment.cts.service.UserService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("api/user")
 public class UserController {
