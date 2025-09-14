@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -140,10 +141,11 @@ public class DataInitialiser implements ApplicationRunner {
         Product product = new Product();
         product.setSymbol(productInit.getSymbol());
         product.setStatus(productInit.getStatus());
-        Currency base = this.currencyRepository.findByCode(productInit.getBaseCurrencyCode());
-        Currency quote = this.currencyRepository.findByCode(productInit.getQuoteCurrencyCode());
-        product.setBaseCurrency(base);
-        product.setQuoteCurrency(quote);
+        Optional<Currency> base = this.currencyRepository.findByCode(productInit.getBaseCurrencyCode());
+        Optional<Currency> quote = this.currencyRepository.findByCode(productInit.getQuoteCurrencyCode());
+        // Since it's initialising during application startup, it should be okay to just call get
+        product.setBaseCurrency(base.get());
+        product.setQuoteCurrency(quote.get());
         return product;
     }
 
@@ -159,10 +161,10 @@ public class DataInitialiser implements ApplicationRunner {
     private WalletBalance mapToWalletBalanceEntity(WalletBalanceInit walletBalanceInit) {
         WalletBalance walletBalance = new WalletBalance();
         User user = this.userRepository.findByEmail(walletBalanceInit.getUserEmail());
-        Wallet wallet = this.walletRepository.findByUserAndWalletType(user, walletBalanceInit.getWalletType());
-        Currency currency = this.currencyRepository.findByCode(walletBalanceInit.getCurrencyCode());
-        walletBalance.setWallet(wallet);
-        walletBalance.setCurrency(currency);
+        Optional<Wallet> wallet = this.walletRepository.findByUserAndWalletType(user, walletBalanceInit.getWalletType());
+        Optional<Currency> currency = this.currencyRepository.findByCode(walletBalanceInit.getCurrencyCode());
+        walletBalance.setWallet(wallet.get());
+        walletBalance.setCurrency(currency.get());
         walletBalance.setAvailableBalance(walletBalanceInit.getAvailableBalance());
         return walletBalance;
     }
