@@ -3,11 +3,10 @@ package com.assessment.cts.service;
 import com.assessment.cts.entity.Price;
 import com.assessment.cts.model.PriceDTO;
 import com.assessment.cts.model.ResponseDTO;
-
-import java.util.List;
+import com.assessment.cts.model.ResponseListDTO;
 
 public interface PriceService {
-    PriceDTO getLatestPrice(String ccyPair);
-    List<PriceDTO> getAllLatestPrices();
+    ResponseDTO<PriceDTO> getLatestPrice(String ccyPair);
+    ResponseListDTO<PriceDTO> getAllLatestPrices();
     ResponseDTO<PriceDTO> saveThisPrice(Price price);
 }

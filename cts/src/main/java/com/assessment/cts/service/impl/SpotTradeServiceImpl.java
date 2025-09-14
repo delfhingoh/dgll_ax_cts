@@ -2,10 +2,7 @@ package com.assessment.cts.service.impl;
 
 import com.assessment.cts.entity.*;
 import com.assessment.cts.enums.*;
-import com.assessment.cts.model.PriceDTO;
-import com.assessment.cts.model.ResponseDTO;
-import com.assessment.cts.model.TradeRequestDTO;
-import com.assessment.cts.model.TradeResponseDTO;
+import com.assessment.cts.model.*;
 import com.assessment.cts.repository.ProductRepository;
 import com.assessment.cts.repository.TradeRepository;
 import com.assessment.cts.repository.UserRepository;
@@ -59,14 +56,14 @@ public class SpotTradeServiceImpl implements TradeService {
                     return this.helperUtility.transformToResponseDTO(null, ResponseStatus.INVALID, "The product is not tradable in this system.");
                 }
                 // Ensure that there are prices for the product
-                PriceDTO latestPrice = this.priceService.getLatestPrice(currencyPair);
-                if (latestPrice == null) {
-                    return this.helperUtility.transformToResponseDTO(null, ResponseStatus.INVALID, "There is no price for this product.");
+                ResponseDTO<PriceDTO> latestPrice = this.priceService.getLatestPrice(currencyPair);
+                if (latestPrice.getResponse() == null) {
+                    return this.helperUtility.transformToResponseDTO(null, latestPrice.getResponseStatus(), latestPrice.getMessage());
                 }
 
                 // Calculate the final amount from this BUY order
                 BigDecimal notionalAmount = tradeRequestDTO.getAmount(); // This is the amount of QUOTE (USDT)
-                BigDecimal rateAmount = latestPrice.getAskPrice();
+                BigDecimal rateAmount = latestPrice.getResponse().getAskPrice();
                 BigDecimal finalAmount = notionalAmount.divide(rateAmount, 8, RoundingMode.HALF_UP);
 
                 // Ensure that user have the wallet for this product type otherwise create it
@@ -131,14 +128,14 @@ public class SpotTradeServiceImpl implements TradeService {
                     return this.helperUtility.transformToResponseDTO(null, ResponseStatus.INVALID, "The product is not tradable in this system.");
                 }
                 // Ensure that there are prices for the product
-                PriceDTO latestPrice = this.priceService.getLatestPrice(currencyPair);
-                if (latestPrice == null) {
-                    return this.helperUtility.transformToResponseDTO(null, ResponseStatus.INVALID, "There is no price for this product.");
+                ResponseDTO<PriceDTO> latestPrice = this.priceService.getLatestPrice(currencyPair);
+                if (latestPrice.getResponse() == null) {
+                    return this.helperUtility.transformToResponseDTO(null, latestPrice.getResponseStatus(), latestPrice.getMessage());
                 }
 
                 // Calculate the final amount from this SELL order
                 BigDecimal notionalAmount = tradeRequestDTO.getAmount(); // This is the amount of BASE (ETH or BTC)
-                BigDecimal rateAmount = latestPrice.getBidPrice();
+                BigDecimal rateAmount = latestPrice.getResponse().getBidPrice();
                 BigDecimal finalAmount = notionalAmount.multiply(rateAmount).setScale(8, RoundingMode.HALF_UP);
 
                 // Ensure that user have the wallet for this product type otherwise create it

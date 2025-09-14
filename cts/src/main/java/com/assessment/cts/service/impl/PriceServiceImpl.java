@@ -5,22 +5,23 @@ import com.assessment.cts.entity.Product;
 import com.assessment.cts.enums.ResponseStatus;
 import com.assessment.cts.model.PriceDTO;
 import com.assessment.cts.model.ResponseDTO;
+import com.assessment.cts.model.ResponseListDTO;
 import com.assessment.cts.repository.PriceRepository;
 import com.assessment.cts.repository.ProductRepository;
 import com.assessment.cts.service.HelperUtility;
 import com.assessment.cts.service.PriceService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class PriceServiceImpl implements PriceService {
     private final PriceRepository priceRepository;
     private final ProductRepository productRepository;
-    private HelperUtility helper;
+    private final HelperUtility helper;
 
     @Override
     public ResponseDTO<PriceDTO> saveThisPrice(Price price) {
@@ -28,56 +29,42 @@ public class PriceServiceImpl implements PriceService {
             this.priceRepository.save(price);
             return this.helper.transformToResponseDTO(mapToPriceDTO(price), ResponseStatus.SUCCESS, "Saved price successfully");
         } catch (Exception e) {
-            return this.helper.transformToResponseDTO(mapToPriceDTO(price), ResponseStatus.ERROR, "Unable to save price: " + price.getProduct());
+            return this.helper.transformToResponseDTO(mapToPriceDTO(price), ResponseStatus.ERROR, "Unable to save price: " + price.getProduct().getSymbol());
         }
     }
 
     @Override
-    public PriceDTO getLatestPrice(String ccyPair) {
+    public ResponseDTO<PriceDTO> getLatestPrice(String ccyPair) {
         try {
             Optional<Product> productOptional = Optional.ofNullable(this.productRepository.findBySymbol(ccyPair));
             if (productOptional.isEmpty()) {
-                PriceDTO priceDTO = new PriceDTO();
-                priceDTO.setStatus(ResponseStatus.INVALID);
-                priceDTO.setMessage("This " + ccyPair + " is not available in our system.");
-                return priceDTO;
+                return this.helper.transformToResponseDTO(null, ResponseStatus.INVALID, "This " + ccyPair + " is not available in our system.");
             } else {
                 Price latestPrice = this.priceRepository.findFirstByProductOrderByCreatedAtDesc(productOptional.get());
                 if (latestPrice == null) {
-                    PriceDTO priceDTO = new PriceDTO();
-                    priceDTO.setStatus(ResponseStatus.INVALID);
-                    priceDTO.setMessage("There is no latest price for " + ccyPair + ".");
-                    return priceDTO;
+                    return this.helper.transformToResponseDTO(null, ResponseStatus.INVALID, "There is no latest price for " + ccyPair + ".");
                 }
-                return mapToPriceDTO(latestPrice);
+                return this.helper.transformToResponseDTO(mapToPriceDTO(latestPrice), ResponseStatus.SUCCESS, "Retrieved latest price successfully.");
             }
         } catch (Exception e) {
-            PriceDTO priceDTO = new PriceDTO();
-            priceDTO.setStatus(ResponseStatus.ERROR);
-            priceDTO.setMessage("Something went wrong. Please try again later.");
-            return priceDTO;
+            return this.helper.transformToResponseDTO(null, ResponseStatus.ERROR, "Something went wrong. Please try again later.");
         }
     }
 
     @Override
-    public List<PriceDTO> getAllLatestPrices() {
+    public ResponseListDTO<PriceDTO> getAllLatestPrices() {
         try {
             List<Price> allProductLatestPrices = this.priceRepository.findLatestPricePerProduct();
             if (allProductLatestPrices.isEmpty()) {
-                PriceDTO priceDTO = new PriceDTO();
-                priceDTO.setStatus(ResponseStatus.INVALID);
-                priceDTO.setMessage("There are no prices for any product.");
-                return List.of(priceDTO);
+                return this.helper.transformToResponseListDTO(List.of(), ResponseStatus.INVALID, "There are no prices for any product.");
             } else {
-                return allProductLatestPrices.stream()
+                List<PriceDTO> priceDTOList = allProductLatestPrices.stream()
                         .map(this::mapToPriceDTO)
                         .toList();
+                return this.helper.transformToResponseListDTO(priceDTOList, ResponseStatus.SUCCESS, "Retrieved all prices for any product.");
             }
         } catch(Exception e) {
-            PriceDTO priceDTO = new PriceDTO();
-            priceDTO.setStatus(ResponseStatus.ERROR);
-            priceDTO.setMessage("Something went wrong. Please try again later.");
-            return List.of(priceDTO);
+            return this.helper.transformToResponseListDTO(null, ResponseStatus.ERROR, "Something went wrong. Please try again later.");
         }
     }
 
