@@ -9,20 +9,20 @@ import com.assessment.cts.repository.UserRepository;
 import com.assessment.cts.repository.WalletBalanceRepository;
 import com.assessment.cts.service.*;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * In the future:
  * Should handle invalid product type properly
  * Change to ResponseDTO<T> and ResponseListDTO<T> more consistently
  * */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class SpotTradeServiceImpl implements TradeService {
 
@@ -34,7 +34,7 @@ public class SpotTradeServiceImpl implements TradeService {
     private final WalletService walletService;
     private final CurrencyService currencyService;
 
-    private HelperUtility helperUtility;
+    private final HelperUtility helperUtility;
 
     /**
      * BUY: ETHUSDT or BTCUSDT

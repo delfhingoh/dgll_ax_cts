@@ -6,24 +6,23 @@ import com.assessment.cts.entity.WalletBalance;
 import com.assessment.cts.enums.ResponseStatus;
 import com.assessment.cts.model.ResponseDTO;
 import com.assessment.cts.model.ResponseListDTO;
-import com.assessment.cts.model.TradeRequestDTO;
 import com.assessment.cts.model.TradeResponseDTO;
 import com.assessment.cts.repository.WalletBalanceRepository;
 import com.assessment.cts.service.HelperUtility;
 import com.assessment.cts.service.WalletBalanceService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class WalletBalanceServiceImpl implements WalletBalanceService {
 
     private final WalletBalanceRepository walletBalanceRepository;
-    private HelperUtility helper;
+    private final HelperUtility helper;
 
     @Override
     public ResponseDTO<WalletBalance> findByWalletUserUuidAndCurrencyCode(String uuid, String currencyCode) {

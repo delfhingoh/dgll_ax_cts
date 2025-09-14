@@ -5,10 +5,10 @@ import com.assessment.cts.entity.Wallet;
 import com.assessment.cts.enums.ProductType;
 import com.assessment.cts.repository.WalletRepository;
 import com.assessment.cts.service.WalletService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class WalletServiceImpl implements WalletService {
 

@@ -1,6 +1,5 @@
 package com.assessment.cts.model;
 
-import com.assessment.cts.enums.ResponseStatus;
 import com.assessment.cts.enums.TradeDirection;
 import com.assessment.cts.enums.TradeStatus;
 import lombok.Data;

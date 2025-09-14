@@ -8,16 +8,15 @@ import com.assessment.cts.model.TradeResponseDTO;
 import com.assessment.cts.model.WalletBalanceResponseDTO;
 import com.assessment.cts.repository.*;
 import com.assessment.cts.service.HelperUtility;
-import com.assessment.cts.service.TradeService;
 import com.assessment.cts.service.UserService;
 import com.assessment.cts.service.WalletBalanceService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 

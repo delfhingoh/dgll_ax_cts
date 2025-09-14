@@ -3,10 +3,10 @@ package com.assessment.cts.service.impl;
 import com.assessment.cts.entity.Currency;
 import com.assessment.cts.repository.CurrencyRepository;
 import com.assessment.cts.service.CurrencyService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class CurrencyServiceImpl implements CurrencyService {
 

@@ -1,6 +1,5 @@
 package com.assessment.cts.entity;
 
-import com.assessment.cts.enums.ProductType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

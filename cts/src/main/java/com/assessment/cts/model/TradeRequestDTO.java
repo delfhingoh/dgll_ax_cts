@@ -1,7 +1,6 @@
 package com.assessment.cts.model;
 
 import com.assessment.cts.enums.ProductType;
-import com.assessment.cts.enums.TradeDirection;
 import lombok.Data;
 
 import java.math.BigDecimal;

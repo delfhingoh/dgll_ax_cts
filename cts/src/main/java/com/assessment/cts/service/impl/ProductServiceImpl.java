@@ -4,13 +4,13 @@ import com.assessment.cts.entity.Product;
 import com.assessment.cts.enums.Status;
 import com.assessment.cts.repository.ProductRepository;
 import com.assessment.cts.service.ProductService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
