@@ -2,7 +2,7 @@ package com.assessment.cts.service.impl;
 
 import com.assessment.cts.client.BinanceServiceClient;
 import com.assessment.cts.enums.PriceSource;
-import com.assessment.cts.model.PriceResponse;
+import com.assessment.cts.model.api.PriceResponse;
 import com.assessment.cts.model.api.binance.BinanceTicker;
 import com.assessment.cts.service.ExchangePriceService;
 import lombok.RequiredArgsConstructor;

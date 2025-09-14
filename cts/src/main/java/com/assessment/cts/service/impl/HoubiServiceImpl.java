@@ -2,7 +2,7 @@ package com.assessment.cts.service.impl;
 
 import com.assessment.cts.client.HoubiServiceClient;
 import com.assessment.cts.enums.PriceSource;
-import com.assessment.cts.model.PriceResponse;
+import com.assessment.cts.model.api.PriceResponse;
 import com.assessment.cts.model.api.houbi.HoubiTicker;
 import com.assessment.cts.model.api.houbi.HoubiTickerResponse;
 import com.assessment.cts.service.ExchangePriceService;

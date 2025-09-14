@@ -41,7 +41,7 @@ public class PriceServiceImpl implements PriceService {
         } catch (Exception e) {
             PriceDTO priceDTO = new PriceDTO();
             priceDTO.setStatus(ResponseStatus.ERROR);
-            priceDTO.setMessage(e.getMessage());
+            priceDTO.setMessage("Something went wrong. Please try again later.");
             return priceDTO;
         }
     }
@@ -60,10 +60,10 @@ public class PriceServiceImpl implements PriceService {
                         .map(this::mapToPriceDTO)
                         .toList();
             }
-        } catch(Exception e){
+        } catch(Exception e) {
             PriceDTO priceDTO = new PriceDTO();
             priceDTO.setStatus(ResponseStatus.ERROR);
-            priceDTO.setMessage("Something went wrong in fetching all products latest prices.");
+            priceDTO.setMessage("Something went wrong. Please try again later.");
             return List.of(priceDTO);
         }
     }

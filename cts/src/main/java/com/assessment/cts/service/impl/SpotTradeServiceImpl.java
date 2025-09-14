@@ -1,17 +1,17 @@
 package com.assessment.cts.service.impl;
 
-import com.assessment.cts.model.TradeRequest;
-import com.assessment.cts.model.TradeResponse;
+import com.assessment.cts.model.TradeRequestDTO;
+import com.assessment.cts.model.TradeResponseDTO;
 import com.assessment.cts.service.TradeService;
 
 public class SpotTradeServiceImpl implements TradeService {
     @Override
-    public TradeResponse buy(TradeRequest tradeRequest) {
+    public TradeResponseDTO buy(TradeRequestDTO tradeRequestDTO) {
         return null;
     }
 
     @Override
-    public TradeResponse sell(TradeRequest tradeRequest) {
+    public TradeResponseDTO sell(TradeRequestDTO tradeRequestDTO) {
         return null;
     }
 }
