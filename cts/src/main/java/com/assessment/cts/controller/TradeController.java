@@ -4,13 +4,13 @@ import com.assessment.cts.model.ResponseDTO;
 import com.assessment.cts.model.TradeRequestDTO;
 import com.assessment.cts.model.TradeResponseDTO;
 import com.assessment.cts.service.TradeService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/trade")
 public class TradeController {

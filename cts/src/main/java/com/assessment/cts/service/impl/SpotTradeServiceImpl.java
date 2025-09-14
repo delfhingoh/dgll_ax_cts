@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * In the future: Should handle invalid product type properly
+ * In the future:
+ * Should handle invalid product type properly
+ * Change to ResponseDTO<T> and ResponseListDTO<T> more consistently
  * */
 @AllArgsConstructor
 @Service
@@ -45,9 +47,9 @@ public class SpotTradeServiceImpl implements TradeService {
         try {
             if (isValidTrade(tradeRequestDTO)) {
                 // Ensure that the user exists
-                User user = this.userService.getUserByUuid(tradeRequestDTO.getUuid());
-                if (user == null) {
-                    return this.helperUtility.transformToResponseDTO(null, ResponseStatus.ERROR, "No user in this system.");
+                ResponseDTO<User> user = this.userService.getUserByUuid(tradeRequestDTO.getUuid());
+                if (user.getResponse() == null) {
+                    return this.helperUtility.transformToResponseDTO(null, user.getResponseStatus(), user.getMessage());
                 }
                 // Ensure that the currency pair is tradable
                 String currencyPair = getCurrencyPair(tradeRequestDTO);
@@ -68,7 +70,7 @@ public class SpotTradeServiceImpl implements TradeService {
 
                 // Ensure that user have the wallet for this product type otherwise create it
                 // In theory, the ProductType would be valid because of TradeRequestDTO but any invalid ProductType exception handling is not done yet
-                Wallet wallet = this.walletService.getOrCreateWallet(user, tradeRequestDTO.getProductType());
+                Wallet wallet = this.walletService.getOrCreateWallet(user.getResponse(), tradeRequestDTO.getProductType());
                 // Ensure that user's wallet have the currencies and balances for such trade
                 Currency baseCurrency = this.currencyService.getCurrencyByCode(tradeRequestDTO.getBaseCurrency());
                 Currency quoteCurrency = this.currencyService.getCurrencyByCode(tradeRequestDTO.getQuoteCurrency());
@@ -91,7 +93,7 @@ public class SpotTradeServiceImpl implements TradeService {
                 }
 
                 // Add it into the trade
-                Trade trade = transformToTrade(tradeRequestDTO, product, user);
+                Trade trade = transformToTrade(tradeRequestDTO, product, user.getResponse());
                 trade.setDirection(TradeDirection.BUY);
                 trade.setRateAmount(rateAmount);
                 trade.setFinalAmount(finalAmount);
@@ -117,9 +119,9 @@ public class SpotTradeServiceImpl implements TradeService {
         try {
             if (isValidTrade(tradeRequestDTO)) {
                 // Ensure that the user exists
-                User user = this.userService.getUserByUuid(tradeRequestDTO.getUuid());
-                if (user == null) {
-                    return this.helperUtility.transformToResponseDTO(null, ResponseStatus.ERROR, "No user in this system.");
+                ResponseDTO<User> user = this.userService.getUserByUuid(tradeRequestDTO.getUuid());
+                if (user.getResponse() == null) {
+                    return this.helperUtility.transformToResponseDTO(null, user.getResponseStatus(), user.getMessage());
                 }
                 // Ensure that the currency pair is tradable
                 String currencyPair = getCurrencyPair(tradeRequestDTO);
@@ -140,7 +142,7 @@ public class SpotTradeServiceImpl implements TradeService {
 
                 // Ensure that user have the wallet for this product type otherwise create it
                 // In theory, the ProductType would be valid because of TradeRequestDTO but any invalid ProductType exception handling is not done yet
-                Wallet wallet = this.walletService.getOrCreateWallet(user, tradeRequestDTO.getProductType());
+                Wallet wallet = this.walletService.getOrCreateWallet(user.getResponse(), tradeRequestDTO.getProductType());
                 // Ensure that user's wallet have the currencies and balances for such trade
                 Currency baseCurrency = this.currencyService.getCurrencyByCode(tradeRequestDTO.getBaseCurrency());
                 Currency quoteCurrency = this.currencyService.getCurrencyByCode(tradeRequestDTO.getQuoteCurrency());
@@ -163,7 +165,7 @@ public class SpotTradeServiceImpl implements TradeService {
                 }
 
                 // Add it into the trade
-                Trade trade = transformToTrade(tradeRequestDTO, product, user);
+                Trade trade = transformToTrade(tradeRequestDTO, product, user.getResponse());
                 trade.setDirection(TradeDirection.SELL);
                 trade.setRateAmount(rateAmount);
                 trade.setFinalAmount(finalAmount);
