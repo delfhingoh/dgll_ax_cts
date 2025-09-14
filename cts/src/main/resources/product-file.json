@@ -1,0 +1,14 @@
+[
+  {
+    "baseCurrencyCode": "ETH",
+    "quoteCurrencyCode": "USDT",
+    "symbol": "ETHUSDT",
+    "status": "ACTIVE"
+  },
+  {
+    "baseCurrencyCode": "BTC",
+    "quoteCurrencyCode": "USDT",
+    "symbol": "BTCUSDT",
+    "status": "ACTIVE"
+  }
+]

@@ -1,0 +1,8 @@
+[
+  {
+    "userEmail": "johndoe@cts.com",
+    "currencyCode": "USDT",
+    "walletType": "SPOT",
+    "availableBalance": 50000
+  }
+]

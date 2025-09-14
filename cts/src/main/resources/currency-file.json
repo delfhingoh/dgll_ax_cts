@@ -1,0 +1,26 @@
+[
+  {
+    "type": "STABLECOIN",
+    "code": "USDT",
+    "name": "Tether",
+    "symbol": "USDT",
+    "decimals": 8,
+    "status": "ACTIVE"
+  },
+  {
+    "type": "CRYPTO",
+    "code": "ETH",
+    "name": "Ethereum",
+    "symbol": "U+039E",
+    "decimals": 8,
+    "status": "ACTIVE"
+  },
+  {
+    "type": "CRYPTO",
+    "code": "BTC",
+    "name": "Bitcoin",
+    "symbol": "U+20BF",
+    "decimals": 8,
+    "status": "ACTIVE"
+  }
+]

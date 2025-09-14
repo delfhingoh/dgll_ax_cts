@@ -8,7 +8,7 @@ spring:
     password: sa
   jpa:
     hibernate:
-      ddl-auto: update  # auto-create / update tables
+      ddl-auto: create-drop  # auto-create / update tables
     show-sql: true      # log SQL in console
   h2:
     console:
