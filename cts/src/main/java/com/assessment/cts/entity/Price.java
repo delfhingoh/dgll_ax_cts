@@ -2,6 +2,8 @@ package com.assessment.cts.entity;
 
 import com.assessment.cts.enums.PriceSource;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -13,6 +15,8 @@ import java.time.LocalDateTime;
         @Index(name = "idx_price_product_created", columnList = "product_id, createdAt")
     }
 )
+@Getter
+@Setter
 public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
