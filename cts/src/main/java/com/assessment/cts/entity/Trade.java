@@ -10,11 +10,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(
     indexes = {
-            @Index(name = "idx_trade_user", columnList = "user_id")
+        @Index(name = "idx_trade_user_created", columnList = "user_id, createdAt")
     }
 )
 @Getter
@@ -54,4 +55,11 @@ public class Trade {
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.tuid == null) {
+            this.tuid = UUID.randomUUID().toString();
+        }
+    }
 }
