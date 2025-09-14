@@ -1,8 +1,7 @@
 package com.assessment.cts.service;
 
-import com.assessment.cts.model.PriceResponse;
+import com.assessment.cts.model.api.PriceResponse;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

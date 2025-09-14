@@ -1,6 +1,6 @@
 package com.assessment.cts.service;
 
-import com.assessment.cts.model.PriceResponse;
+import com.assessment.cts.model.api.PriceResponse;
 
 import java.util.List;
 
